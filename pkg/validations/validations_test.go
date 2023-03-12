@@ -5,16 +5,6 @@ import (
 	"testing"
 )
 
-// func UrlValidation(urlInput string) error {
-// 	_, err := url.ParseRequestURI(urlInput)
-// 	if err != nil {
-// 		logrus.Printf("URL is not valid: %+v", err)
-// 		return err
-// 	}
-
-// 	return nil
-// }
-
 func Test_Validations(t *testing.T) {
 
 	type urlTest struct {
