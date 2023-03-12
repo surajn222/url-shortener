@@ -7,6 +7,8 @@ TODO:
 3. URL Shortner Setup
 4. Config Manager Setup
 5. Map/File Storage Setup
-6. URL Shortner Setup
+6. URL Shortner Setup: Completed
 7. Logging Setup
+8. Testing Setup
 8. Database Setup
+
