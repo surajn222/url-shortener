@@ -27,7 +27,7 @@ func main() {
 	s1.HandleFunc("", muxGetLinks)
 
 	s2 := router.PathPrefix("/shortenurl").Subrouter()
-	s2.HandleFunc("/{url}", muxUrlShorten)
+	s2.HandleFunc("", muxUrlShorten)
 
 	s3 := router.PathPrefix("/").Subrouter()
 	s3.HandleFunc("/{*}", redir)
@@ -48,9 +48,13 @@ func muxGetLinks(response http.ResponseWriter, request *http.Request) {
 }
 
 func muxUrlShorten(response http.ResponseWriter, request *http.Request) {
-	code := mux.Vars(request)["url"]
-	shortenedUrl := shortener.UrlShorten(code)
-	resString := code + ":" + shortenedUrl
+	logrus.Printf("%+v", request)
+	// path := mux.Vars(request)["URL"]
+	// path := request.URL.String()
+	path := request.URL.Query().Get("url")
+	logrus.Println(path)
+	shortenedUrl := shortener.UrlShorten(path)
+	resString := path + ":" + shortenedUrl
 	storage.StoreShortenedLinks(resString, shortenedUrl)
 	fmt.Fprintf(response, resString)
 }
