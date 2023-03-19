@@ -22,29 +22,28 @@ It provides the following functionalities :
 
 ### Usage
 
-a. To visit Index page, with instructions
-    http://localhost:8081
+a. To visit Index page, with instructions  
+    http://localhost:8081  
 
-b. To shorten url:
-    http://localhost:8081/shortenurl?url=google.com
-    http://localhost:8081/shortenurl?url=chat.openai.com
+b. To shorten url:  
+    http://localhost:8081/shortenurl?url=google.com  
+    http://localhost:8081/shortenurl?url=chat.openai.com  
 
-c. To get domain count of which URLs were shortened:
-    http://localhost:8081/domaincount
+c. To get domain count of which URLs were shortened:  
+    http://localhost:8081/domaincount  
 
-d. Redirect to :
-    http://localhost:8081/
+d. Redirect to:  
+    http://localhost:8081/  
 
 
-
-TODO:
-Basic WebServer Setup: Completed
-Parse URL to get Link: Completed
-URL Shortner Logic: Partially Completed. Algo tuning Pending
-Config Manager Setup: Completed
-In Memory Storage Setup: Completed
-Validations: Completed
-Database Setup: Redis Database Completed
-Interfaces for supporting multiple Databases: Completed
-Logging: Always In Progress
-Testing: Always In Progress
+TODO:  
+Basic WebServer Setup: Completed  
+Parse URL to get Link: Completed  
+URL Shortner Logic: Partially Completed. Algo tuning Pending  
+Config Manager Setup: Completed  
+In Memory Storage Setup: Completed  
+Validations: Completed  
+Database Setup: Redis Database Completed  
+Interfaces for supporting multiple Databases: Completed  
+Logging: Always In Progress  
+Testing: Always In Progress  
