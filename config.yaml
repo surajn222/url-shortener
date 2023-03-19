@@ -1,0 +1,9 @@
+storage: 
+  storage_type: memory
+  # storage_type: redis
+
+database:
+  dbname: redis
+  dbport: 6379
+  dbuser: 
+  dbpassword: 

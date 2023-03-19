@@ -1,7 +1,6 @@
 package validations
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -19,7 +18,6 @@ func Test_Validations(t *testing.T) {
 
 	for _, v := range arrUrlInput {
 		err := UrlValidation(v.url)
-		fmt.Println(err)
 
 		if err != nil {
 			t.Errorf("Invalid URL: got Error %v, want %v",

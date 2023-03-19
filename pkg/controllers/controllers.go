@@ -6,13 +6,19 @@ import (
 	"net/http"
 
 	"github.com/surajn222/url-shortener/pkg/shortener"
-	storage "github.com/surajn222/url-shortener/pkg/storage/redis_storage"
+
+	storage "github.com/surajn222/url-shortener/pkg/storage"
 	"github.com/surajn222/url-shortener/pkg/utils"
 	"github.com/surajn222/url-shortener/pkg/validations"
 )
 
+func getStorage() storage.InterfaceStorage {
+	return storage.GetStorageObject()
+}
+
 func MuxDomainCount(response http.ResponseWriter, request *http.Request) {
-	jsonDomainCount := storage.GetDomainCount()
+	storageObject := getStorage()
+	jsonDomainCount := storageObject.GetDomainCount()
 	mapDomainCount, err := json.Marshal(jsonDomainCount)
 	if err != err {
 		fmt.Fprintf(response, "unable to get domain count from database")
@@ -23,7 +29,8 @@ func MuxDomainCount(response http.ResponseWriter, request *http.Request) {
 }
 
 func MuxGetLinks(response http.ResponseWriter, request *http.Request) {
-	jsonAllLinks := storage.GetAllLinks()
+	storageObject := getStorage()
+	jsonAllLinks := storageObject.GetAllLinks()
 	mapAllLinks, err := json.Marshal(jsonAllLinks)
 	if err != err {
 		fmt.Fprintf(response, "unable to get mux links")
@@ -34,6 +41,7 @@ func MuxGetLinks(response http.ResponseWriter, request *http.Request) {
 }
 
 func MuxUrlShorten(response http.ResponseWriter, request *http.Request) {
+	storageObject := getStorage()
 	url := request.URL.Query().Get("url")
 
 	// Validate if input is URL
@@ -44,9 +52,9 @@ func MuxUrlShorten(response http.ResponseWriter, request *http.Request) {
 		responseString := "{" + url + ":" + "http://localhost:8081/" + shortenedUrl + "}"
 
 		// Store shortened links to database
-		err1 := storage.StoreShortenedLinks(url, shortenedUrl)
+		err1 := storageObject.InsertShortenedLinks(url, shortenedUrl)
 		domainName := utils.GetDomainFromUrl(url)
-		err2 := storage.UpdateDomainCount(domainName)
+		err2 := storageObject.UpdateDomainCount(domainName)
 		if err2 != nil && err1 != nil {
 			panic(err2)
 			fmt.Fprintf(response, "unable to shorten URL")
@@ -59,15 +67,21 @@ func MuxUrlShorten(response http.ResponseWriter, request *http.Request) {
 }
 
 func MuxRedirect(response http.ResponseWriter, request *http.Request) {
+	storageObject := getStorage()
 	// Get link from database and redirect
-	strShortenedUrl, err := storage.GetLink(request.URL.Path[1:])
-	fmt.Println(strShortenedUrl)
+	strShortenedUrl, err := storageObject.GetLink(request.URL.Path[1:])
 	if err != nil {
-		fmt.Fprintf(response, "unable to find URL")
+		http.Redirect(response, request, "http://localhost:8081/index.html", http.StatusMovedPermanently)
 	} else {
 		http.Redirect(response, request, strShortenedUrl, http.StatusMovedPermanently)
 	}
 }
+
+// func MuxPath(response http.ResponseWriter, request *http.Request) {
+// 	// Get link from database and redirect
+// 	fmt.Fprintf(response, "Path")
+
+// }
 
 func MuxIndex(response http.ResponseWriter, request *http.Request) {
 	responseString := `

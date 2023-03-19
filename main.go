@@ -24,11 +24,13 @@ func main() {
 	s3 := router.PathPrefix("/domaincount").Subrouter()
 	s3.HandleFunc("", controllers.MuxDomainCount)
 
-	s4 := router.PathPrefix("/").Subrouter()
-	s4.HandleFunc("/index.html", controllers.MuxIndex)
-
 	s5 := router.PathPrefix("/").Subrouter()
 	s5.HandleFunc("/{*}", controllers.MuxRedirect)
+
+	s6 := router.PathPrefix("/").Subrouter()
+	s6.HandleFunc("/", controllers.MuxIndex)
+	// s6 := router.PathPrefix("/").Subrouter()
+	// s6.HandleFunc("/path", controllers.MuxPath)
 
 	// Start server
 	err := http.ListenAndServe(":8081", router)

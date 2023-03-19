@@ -11,23 +11,28 @@ It provides the following functionalities :
 ### Running the Application
 ## Running with docker
 
+0. In Config file, add the required configurations
 1. docker compose up    
-2. Access the below links:  
+2. Access the below links, mentioned in Usage
 
 ## Running locally
-1. Pending - Config changes required
+0. In Config file, change the Storage to memory
+1. Run "go run main.go"
 
 
 ### Usage
 
-a. To shorten url:
+a. To visit Index page, with instructions
+    http://localhost:8081
+
+b. To shorten url:
     http://localhost:8081/shortenurl?url=google.com
     http://localhost:8081/shortenurl?url=chat.openai.com
 
-b. To get domain count of which URLs were shortened:
+c. To get domain count of which URLs were shortened:
     http://localhost:8081/domaincount
 
-c. Redirect to :
+d. Redirect to :
     http://localhost:8081/
 
 
@@ -36,10 +41,10 @@ TODO:
 Basic WebServer Setup: Completed
 Parse URL to get Link: Completed
 URL Shortner Logic: Partially Completed. Algo tuning Pending
-Config Manager Setup: Pending
+Config Manager Setup: Completed
 In Memory Storage Setup: Completed
 Validations: Completed
 Database Setup: Redis Database Completed
-Interfaces for supporting multiple Databases: Pending
+Interfaces for supporting multiple Databases: Completed
 Logging: Always In Progress
 Testing: Always In Progress
