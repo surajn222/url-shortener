@@ -7,7 +7,9 @@ It provides the following functionalities :
 - Shorten URL
 - Redirect to original URL when request short URL
 - Provide the count of domains of which URLs were shortened
-
+  
+  
+  
 ## Running the Application
 ### Running with docker
 
@@ -19,6 +21,9 @@ It provides the following functionalities :
 0. In Config file, change the Storage to memory
 1. Run "go run main.go"
 
+  
+  
+  
 
 ### Usage
 
