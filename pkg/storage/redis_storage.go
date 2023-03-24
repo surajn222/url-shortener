@@ -19,7 +19,7 @@ type RedisStorage struct {
 
 func (r *RedisStorage) connect() *redis.Client {
 	client := redis.NewClient(&redis.Options{
-		Addr:     r.DBName + ":" + string(r.DBPort),
+		Addr:     r.DBName + ":" + fmt.Sprint(r.DBPort),
 		Password: r.DBPassword,
 		DB:       0,
 	})

@@ -1,15 +1,13 @@
 package storage
 
 import (
-	"fmt"
-
-	"github.com/spf13/viper"
+	log "github.com/sirupsen/logrus"
 	"github.com/surajn222/url-shortener/pkg/config"
 )
 
-func GetStorageObject() InterfaceStorage {
-	config := getStorageFromConfig()
-
+func GetStorageObject(config config.Configurations) InterfaceStorage {
+	// config := getStorageFromConfig()
+	log.Infof("Storage is %+v", config.Storage.Storage_type)
 	if config.Storage.Storage_type == "memory" {
 		return &MemStorage{}
 	} else if config.Storage.Storage_type == "redis" {
@@ -21,23 +19,4 @@ func GetStorageObject() InterfaceStorage {
 		}
 	}
 	return nil
-}
-
-func getStorageFromConfig() config.Configurations {
-	viper.SetConfigName("config")
-	viper.AddConfigPath(".")
-	viper.SetConfigType("yml")
-	var configuration config.Configurations
-
-	if err := viper.ReadInConfig(); err != nil {
-		fmt.Printf("Error reading config file, %s", err)
-	}
-
-	err := viper.Unmarshal(&configuration)
-	if err != nil {
-		fmt.Printf("Unable to decode into struct, %v", err)
-	}
-
-	return configuration
-
 }

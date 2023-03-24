@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/surajn222/url-shortener/pkg/shortener"
@@ -10,38 +9,57 @@ import (
 	storage "github.com/surajn222/url-shortener/pkg/storage"
 	"github.com/surajn222/url-shortener/pkg/utils"
 	"github.com/surajn222/url-shortener/pkg/validations"
+	"github.com/surajn222/url-shortener/templates/static"
 )
 
-func getStorage() storage.InterfaceStorage {
-	return storage.GetStorageObject()
-}
-
 func MuxDomainCount(response http.ResponseWriter, request *http.Request) {
-	storageObject := getStorage()
+	ctx := request.Context()
+	storageObject := ctx.Value("storage").(storage.InterfaceStorage)
 	jsonDomainCount := storageObject.GetDomainCount()
 	mapDomainCount, err := json.Marshal(jsonDomainCount)
+
 	if err != err {
-		fmt.Fprintf(response, "unable to get domain count from database")
+		response.Write([]byte("Unable to get domain count from database"))
+		response.WriteHeader(404)
 	} else {
-		fmt.Fprintf(response, string(mapDomainCount))
+		response.Write([]byte(string(mapDomainCount)))
+		response.WriteHeader(200)
 	}
 
 }
 
-func MuxGetLinks(response http.ResponseWriter, request *http.Request) {
-	storageObject := getStorage()
+func MuxPath(response http.ResponseWriter, request *http.Request) {
+	ctx := request.Context()
+	storageObject := ctx.Value("storage").(storage.InterfaceStorage)
 	jsonAllLinks := storageObject.GetAllLinks()
 	mapAllLinks, err := json.Marshal(jsonAllLinks)
 	if err != err {
-		fmt.Fprintf(response, "unable to get mux links")
+		response.Write([]byte("Unable to get all links"))
+		response.WriteHeader(404)
 	} else {
-		fmt.Fprintf(response, string(mapAllLinks))
+		response.Write([]byte(string(mapAllLinks)))
+		response.WriteHeader(200)
+	}
+}
+
+func MuxGetLinks(response http.ResponseWriter, request *http.Request) {
+	ctx := request.Context()
+	storageObject := ctx.Value("storage").(storage.InterfaceStorage)
+	jsonAllLinks := storageObject.GetAllLinks()
+	mapAllLinks, err := json.Marshal(jsonAllLinks)
+	if err != err {
+		response.Write([]byte("Unable to get all links"))
+		response.WriteHeader(404)
+	} else {
+		response.Write([]byte(string(mapAllLinks)))
+		response.WriteHeader(200)
 	}
 
 }
 
 func MuxUrlShorten(response http.ResponseWriter, request *http.Request) {
-	storageObject := getStorage()
+	ctx := request.Context()
+	storageObject := ctx.Value("storage").(storage.InterfaceStorage)
 	url := request.URL.Query().Get("url")
 
 	// Validate if input is URL
@@ -57,17 +75,20 @@ func MuxUrlShorten(response http.ResponseWriter, request *http.Request) {
 		err2 := storageObject.UpdateDomainCount(domainName)
 		if err2 != nil && err1 != nil {
 			panic(err2)
-			fmt.Fprintf(response, "unable to shorten URL")
+			response.Write([]byte("Unable to shorten URL"))
+			response.WriteHeader(404)
 		}
-
-		fmt.Fprintf(response, responseString)
+		response.Write([]byte(string(responseString)))
+		response.WriteHeader(200)
 	} else {
-		fmt.Fprintf(response, "invalid URL")
+		response.Write([]byte("Unable to shorten URL"))
+		response.WriteHeader(404)
 	}
 }
 
 func MuxRedirect(response http.ResponseWriter, request *http.Request) {
-	storageObject := getStorage()
+	ctx := request.Context()
+	storageObject := ctx.Value("storage").(storage.InterfaceStorage)
 	// Get link from database and redirect
 	strShortenedUrl, err := storageObject.GetLink(request.URL.Path[1:])
 	if err != nil {
@@ -84,16 +105,7 @@ func MuxRedirect(response http.ResponseWriter, request *http.Request) {
 // }
 
 func MuxIndex(response http.ResponseWriter, request *http.Request) {
-	responseString := `
-a. To shorten url:
-	http://localhost:8081/shortenurl?url=google.com
-	http://localhost:8081/shortenurl?url=chat.openai.com
-
-b. To get domain count of which URLs were shortened:
-    http://localhost:8081/domaincount
-
-c. Redirect to :
-	http://localhost:8081/1d5920f
-	`
-	fmt.Fprintf(response, responseString)
+	responseString := static.IndexResponse
+	response.Write([]byte(string(responseString)))
+	response.WriteHeader(200)
 }

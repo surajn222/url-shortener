@@ -1,107 +1,13 @@
 package controllers
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/surajn222/url-shortener/pkg/controllers"
-	storage "github.com/surajn222/url-shortener/pkg/storage/mem_storage"
+	storage "github.com/surajn222/url-shortener/pkg/storage"
 )
-
-// func Test_muxUrlShorten(t *testing.T) {
-
-// 	type urlShorten struct {
-// 		name     string
-// 		method   string
-// 		url      string
-// 		expected string
-// 	}
-
-// 	urlShorten1 := []urlShorten{
-// 		{name: "google.com", method: "GET", url: "/shortenurl?url=google.com", expected: "google.com:1d5920f"},
-// 		{name: "yahoo.com", method: "GET", url: "/shortenurl?url=yahoo.com", expected: "yahoo.com:50cd1a9"},
-// 	}
-
-// 	for _, k := range urlShorten1 {
-// 		req, err := http.NewRequest(k.method, k.url, nil)
-// 		if err != nil {
-// 			t.Fatal(err)
-// 		}
-// 		rr := httptest.NewRecorder()
-// 		handler := http.HandlerFunc(controllers.MuxUrlShorten)
-// 		handler.ServeHTTP(rr, req)
-// 		if status := rr.Code; status != http.StatusOK {
-// 			t.Errorf("handler returned wrong status code: got %v want %v",
-// 				status, http.StatusOK)
-// 		}
-
-// 		// Check the response body is what we expect.
-// 		expected := k.expected
-// 		if rr.Body.String() != expected {
-// 			t.Errorf("handler returned unexpected body: got %v want %v",
-// 				rr.Body.String(), expected)
-// 		}
-// 	}
-// }
-
-// func Test_getAllLinks(t *testing.T) {
-
-// 	type structGetLinks struct {
-// 		name     string
-// 		method   string
-// 		url      string
-// 		expected string
-// 	}
-
-// 	getLinks := []structGetLinks{
-// 		{name: "getLinks", method: "GET", url: "/getlinks", expected: "abcd"},
-// 	}
-
-// 	for _, k := range getLinks {
-// 		req, err := http.NewRequest(k.method, k.url, nil)
-// 		if err != nil {
-// 			t.Fatal(err)
-// 		}
-// 		rr := httptest.NewRecorder()
-// 		handler := http.HandlerFunc(controllers.MuxUrlShorten)
-// 		handler.ServeHTTP(rr, req)
-// 		if status := rr.Code; status != http.StatusOK {
-// 			t.Errorf("handler returned wrong status code: got %v want %v",
-// 				status, http.StatusOK)
-// 		}
-
-// 		// Check the response body is what we expect.
-// 		expected := k.expected
-// 		if rr.Body.String() != expected {
-// 			t.Errorf("handler returned unexpected body: got %v want %v",
-// 				rr.Body.String(), expected)
-// 		}
-// 	}
-// }
-
-// func TestMyHandler(t *testing.T) {
-// 	req, err := http.NewRequest("GET", "/path", nil)
-// 	if err != nil {
-// 		t.Fatal(err)
-// 	}
-
-// 	rr := httptest.NewRecorder()
-// 	handler := http.HandlerFunc(controllers.MuxPath)
-
-// 	handler.ServeHTTP(rr, req)
-
-// 	if status := rr.Code; status != http.StatusOK {
-// 		t.Errorf("handler returned wrong status code: got %v want %v",
-// 			status, http.StatusOK)
-// 	}
-
-// 	expected := "Path"
-// 	if rr.Body.String() != expected {
-// 		t.Errorf("handler returned unexpected body: got %v want %v",
-// 			rr.Body.String(), expected)
-// 	}
-// }
 
 func Test_MuxUrlShorten(t *testing.T) {
 
@@ -120,12 +26,16 @@ func Test_MuxUrlShorten(t *testing.T) {
 	for _, v := range testCases {
 
 		req, err := http.NewRequest("GET", "/urlshorten?url="+v.url, nil)
+		ctx := req.Context()
+		ctx = context.WithValue(ctx, "storage", &storage.MemStorage{})
+		req = req.WithContext(ctx)
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(controllers.MuxUrlShorten)
+
+		handler := http.HandlerFunc(MuxUrlShorten)
 		handler.ServeHTTP(rr, req)
 
 		if status := rr.Code; status != http.StatusOK {
@@ -143,39 +53,37 @@ func Test_MuxUrlShorten(t *testing.T) {
 
 func Test_MuxDomainCount(t *testing.T) {
 
-	// type testMuxUrl struct {
-	// 	name     string
-	// 	url      string
-	// 	shorturl string
-	// }
-
-	// testCases := []testMuxUrl{
-	// 	{name: "google.com", url: "google.com", shorturl: "1d5920f"},
-	// 	{name: "yahoo.com", url: "yahoo.com", shorturl: "50cd1a9"},
-	// 	{name: "chat.openai.com", url: "chat.openai.com", shorturl: "234455f"},
-	// }
-
-	// for _, v := range testCases {
-
 	storage.Cleanup()
 
 	req, err := http.NewRequest("GET", "/urlshorten?url="+"yahoo.com", nil)
+	ctx := req.Context()
+	ctx = context.WithValue(ctx, "storage", &storage.MemStorage{})
+	req = req.WithContext(ctx)
+
 	rr2 := httptest.NewRecorder()
-	handler2 := http.HandlerFunc(controllers.MuxUrlShorten)
+	handler2 := http.HandlerFunc(MuxUrlShorten)
 	handler2.ServeHTTP(rr2, req)
 
 	req, err = http.NewRequest("GET", "/urlshorten?url="+"google.com", nil)
+	ctx = req.Context()
+	ctx = context.WithValue(ctx, "storage", &storage.MemStorage{})
+
+	req = req.WithContext(ctx)
 	rr3 := httptest.NewRecorder()
-	handler3 := http.HandlerFunc(controllers.MuxUrlShorten)
+	handler3 := http.HandlerFunc(MuxUrlShorten)
 	handler3.ServeHTTP(rr3, req)
 
 	req, err = http.NewRequest("GET", "/domaincount", nil)
+	ctx = req.Context()
+	ctx = context.WithValue(ctx, "storage", &storage.MemStorage{})
+	req = req.WithContext(ctx)
+
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(controllers.MuxDomainCount)
+	handler := http.HandlerFunc(MuxDomainCount)
 	handler.ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusOK {

@@ -1,41 +1,72 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
+	"github.com/surajn222/url-shortener/pkg/config"
 	"github.com/surajn222/url-shortener/pkg/controllers"
+	"github.com/surajn222/url-shortener/pkg/storage"
 )
+
+func getConfig() config.Configurations {
+	viper.SetConfigName("config")
+	viper.AddConfigPath(".")
+	viper.SetConfigType("yaml")
+	var configuration config.Configurations
+
+	if err := viper.ReadInConfig(); err != nil {
+		fmt.Printf("Error reading config file, %s", err)
+	}
+
+	err := viper.Unmarshal(&configuration)
+	if err != nil {
+		fmt.Printf("Unable to decode into struct, %v", err)
+	}
+
+	return configuration
+
+}
 
 func main() {
 	// Main function
-	logrus.Info("WebServer setup")
+	logrus.Info("WebServer Init")
+
+	config := getConfig()
+	storageObject := storage.GetStorageObject(config)
 
 	router := mux.NewRouter()
 
-	// Define Subrouters
-	s1 := router.PathPrefix("/getlinks").Subrouter()
-	s1.HandleFunc("", controllers.MuxGetLinks)
+	router.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// Set the database connection in the request context
+			ctx := r.Context()
+			ctx = context.WithValue(ctx, "storage", storageObject)
+			r = r.WithContext(ctx)
 
-	s2 := router.PathPrefix("/shortenurl").Subrouter()
-	s2.HandleFunc("", controllers.MuxUrlShorten)
+			next.ServeHTTP(w, r)
+		})
+	})
 
-	s3 := router.PathPrefix("/domaincount").Subrouter()
-	s3.HandleFunc("", controllers.MuxDomainCount)
+	router.HandleFunc("/getlinks", controllers.MuxGetLinks).Methods("GET")
 
-	s5 := router.PathPrefix("/").Subrouter()
-	s5.HandleFunc("/{*}", controllers.MuxRedirect)
+	router.HandleFunc("/shortenurl", controllers.MuxUrlShorten).Methods("GET")
 
-	s6 := router.PathPrefix("/").Subrouter()
-	s6.HandleFunc("/", controllers.MuxIndex)
-	// s6 := router.PathPrefix("/").Subrouter()
-	// s6.HandleFunc("/path", controllers.MuxPath)
+	router.HandleFunc("/domaincount", controllers.MuxDomainCount).Methods("GET")
+
+	router.HandleFunc("/{*}", controllers.MuxRedirect).Methods("GET")
+
+	router.HandleFunc("/", controllers.MuxIndex).Methods("GET")
 
 	// Start server
 	err := http.ListenAndServe(":8081", router)
 	if err != nil {
-		logrus.Fatalln("There's an error with the server ", err)
+		log.Fatalln("There's an error with the server ", err)
 	}
 
 }

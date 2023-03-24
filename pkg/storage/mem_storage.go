@@ -16,7 +16,7 @@ type MemStorage struct {
 }
 
 func (*MemStorage) InsertShortenedLinks(link string, shortlink string) error {
-	logrus.Println("Adding links to Map: ", link)
+	logrus.Info("Adding links to Map: ", link)
 
 	if !strings.HasPrefix(link, "https://") && !strings.HasPrefix(link, "http://") {
 		link = "http://" + link
