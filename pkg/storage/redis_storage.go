@@ -28,6 +28,7 @@ func (r *RedisStorage) connect() *redis.Client {
 
 func (r *RedisStorage) InsertShortenedLinks(link string, shortlink string) error {
 	conn_redis := r.connect()
+	defer conn_redis.Close()
 
 	if !strings.HasPrefix(link, "https://") && !strings.HasPrefix(link, "http://") {
 		link = "http://" + link
@@ -51,6 +52,7 @@ func (r *RedisStorage) InsertShortenedLinks(link string, shortlink string) error
 func (r *RedisStorage) UpdateDomainCount(domainName string) error {
 	logrus.Info("Updating domain count")
 	conn_redis := r.connect()
+	defer conn_redis.Close()
 	// Get value from database
 	key := domainName
 	res := conn_redis.ZScore("tags", key)
@@ -69,6 +71,7 @@ func (r *RedisStorage) UpdateDomainCount(domainName string) error {
 
 func (r *RedisStorage) GetLink(shortUrl string) (string, error) {
 	conn_redis := r.connect()
+	defer conn_redis.Close()
 	logrus.Info("Short url:", shortUrl)
 	val, err := conn_redis.Get("/links/" + shortUrl).Result()
 	if err != nil {
