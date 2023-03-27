@@ -1,14 +1,11 @@
 # url-shortener
-url-shortener
 
 The objective is to provide a REST API URL Shortener in Go.
 
-It provides the following functionalities :
-- Shorten URL
-- Redirect to original URL when request short URL
-- Provide the count of domains of which URLs were shortened
-  
-  
+It provides the following functionalities:  
+- Shorten URL  
+- Redirect to original URL when request short URL  
+- Provide the count of domains of which URLs were shortened    
   
 ## Running the Application
 ### Running with docker
@@ -41,8 +38,8 @@ d. Redirect to:
 
 ## Tests  
 
-Tested on Golang 1.17
-To run tests, run 'go test ./..'
+Tested on Golang 1.17  
+To run tests, run 'go test ./..'  
 
 #### TODO:  
 Basic WebServer Setup: Completed  
