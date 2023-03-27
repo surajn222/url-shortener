@@ -22,10 +22,8 @@ It provides the following functionalities :
 1. Run "go run main.go"
 
   
-  
-  
 
-### Usage
+## Usage
 
 a. To visit Index page, with instructions  
     http://localhost:8081  
@@ -40,6 +38,11 @@ c. To get domain count of which URLs were shortened:
 d. Redirect to:  
     http://localhost:8081/  
 
+
+## Tests  
+
+Tested on Golang 1.17
+To run tests, run 'go test ./..'
 
 #### TODO:  
 Basic WebServer Setup: Completed  
